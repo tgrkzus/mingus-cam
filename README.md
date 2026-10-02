@@ -40,6 +40,19 @@ docker compose logs -f
 Set `TZ` (default `Australia/Sydney`) so clip names match the camera's clock, e.g. `TZ=Europe/London docker compose up -d`.
 Leave `data_dir = data` in the config so files land in the volume.
 
+### HTTPS
+
+Point a domain at the server, open ports 80 and 443, and create a `.env` next to `docker-compose.yml`:
+
+```
+DOMAIN=cam.example.com
+COMPOSE_PROFILES=https
+PORT_BIND=127.0.0.1:8080
+```
+
+`docker compose up -d` then also starts Caddy, which gets and renews a Let's Encrypt certificate and serves the page on https://cam.example.com.
+`PORT_BIND` keeps the plain HTTP port reachable only from the server itself.
+
 ## What's on disk
 
 - `data/recordings/` — continuous 10-second files, kept for `recording_keep_hours`

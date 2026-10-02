@@ -1,0 +1,6 @@
+{$DOMAIN} {
+	reverse_proxy mingus-cam:8080 {
+		# keep the live MJPEG stream flowing
+		flush_interval -1
+	}
+}

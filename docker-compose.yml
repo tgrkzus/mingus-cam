@@ -4,7 +4,8 @@ services:
     container_name: mingus-cam
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      # set PORT_BIND=127.0.0.1:8080 when Caddy serves HTTPS in front
+      - "${PORT_BIND:-8080}:8080"
     environment:
       # clip names and the web page use this timezone
       TZ: ${TZ:-Australia/Sydney}
@@ -12,5 +13,23 @@ services:
       - ./config.ini:/app/config.ini:ro
       - mingus-data:/app/data
 
+  # optional HTTPS: set DOMAIN and COMPOSE_PROFILES=https in .env
+  caddy:
+    image: caddy:2
+    profiles: [https]
+    container_name: mingus-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on:
+      - mingus-cam
+
 volumes:
   mingus-data:
+  caddy-data:
