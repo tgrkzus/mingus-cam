@@ -369,7 +369,8 @@ def index():
             day = t.date()
             rows.append(f"<h3>{day.strftime('%a %d %b %Y')}</h3><ul>")
         dur = n.split("_")[1].removesuffix(".mp4") if "_" in n else ""
-        rows.append(f'<li><a href="/clips/{escape(n)}">{t.strftime("%H:%M:%S")}</a> {escape(dur)}</li>')
+        rows.append(f'<li><a href="/clips/{escape(n)}">{t.strftime("%a %d %b %Y, %H:%M:%S")}</a> {escape(dur)}'
+                    f' <span class=ago data-t="{int(t.timestamp() * 1000)}"></span></li>')
     if day is not None:
         rows.append("</ul>")
     status = "recording" if state.recorder_up else "camera offline"
@@ -379,7 +380,27 @@ def index():
             "<h1>catcam</h1>"
             f"<p>Status: {status}. <a href=/>Refresh</a> <a href=/logout>Log out</a></p>"
             "<h2>Live</h2><img src=/live.mjpg alt=live>"
-            f"<h2>Clips ({len(clips)})</h2>" + ("".join(rows) or "<p>No clips yet.</p>"))
+            f"<h2>Clips ({len(clips)})</h2>" + ("".join(rows) or "<p>No clips yet.</p>") + AGO_JS)
+
+
+# fills each clip's "... ago" from its start time, refreshed every 30 s
+AGO_JS = """<script>
+function ago(ms) {
+  var m = Math.floor((Date.now() - ms) / 60000);
+  if (m < 1) return "just now";
+  var n = m, unit = "minute";
+  if (m >= 1440) { n = Math.floor(m / 1440); unit = "day"; }
+  else if (m >= 60) { n = Math.floor(m / 60); unit = "hour"; }
+  return n + " " + unit + (n === 1 ? "" : "s") + " ago";
+}
+function tick() {
+  document.querySelectorAll(".ago").forEach(function (el) {
+    el.textContent = "(" + ago(+el.dataset.t) + ")";
+  });
+}
+tick();
+setInterval(tick, 30000);
+</script>"""
 
 
 @app.route("/live.mjpg")
