@@ -27,6 +27,19 @@ venv/bin/python catcam.py other.ini  # or a different config
 
 Open http://localhost:8080 and enter the passcode.
 
+## Run with Docker
+
+Create `config.ini` as above, then:
+
+```
+docker compose up -d --build
+docker compose logs -f
+```
+
+`config.ini` is mounted read-only into the container, and `data/` lives in the named volume `mingus-cam_mingus-data`, which Docker creates automatically and keeps across rebuilds.
+Set `TZ` (default `Australia/Sydney`) so clip names match the camera's clock, e.g. `TZ=Europe/London docker compose up -d`.
+Leave `data_dir = data` in the config so files land in the volume.
+
 ## What's on disk
 
 - `data/recordings/` — continuous 10-second files, kept for `recording_keep_hours`

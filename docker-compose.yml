@@ -1,0 +1,16 @@
+services:
+  mingus-cam:
+    build: .
+    container_name: mingus-cam
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # clip names and the web page use this timezone
+      TZ: ${TZ:-Australia/Sydney}
+    volumes:
+      - ./config.ini:/app/config.ini:ro
+      - mingus-data:/app/data
+
+volumes:
+  mingus-data:
